@@ -65,3 +65,15 @@ rule mpileup:
     bam   = "results/bam/{sample}.aligned.sorted.bam"
   shell:
     "/BIODATA/programs/bin/bcftools mpileup -O b -o {output} -f {input.fasta} {input.bam}"
+
+rule detect_SNVs:
+  output: "results/vcf/{sample}_variants.vcf"
+  input: "results/bcf/{sample}_raw.bcf"
+  shell:
+   "bcftools call --ploidy 1 -m -v -o {output} {input}"
+
+rule filter_SNVs:
+  output:"results/vcf/{sample}_final_variants.vcf" 
+  input:"results/vcf/{sample}_variants.vcf"
+  shell:
+    "vcfutils.pl varFilter {input} > {output}"
